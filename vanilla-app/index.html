@@ -4,31 +4,54 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Simple To-do App based on Fireship's</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 </head>
-<body>
-
-    <ul id="todos"></ul>
-
-    <form> 
-        <input name="todo" type="text">
-        <input type="submit" value="Add Todo">
-    </form>
+<body class="bg-dark text-white">
+    <main class="container">
+        <div class="row py-5">
+            <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+                <h1 class="pb-3 text-center">To-do App</h1>
+                <div id="root"></div>
+            </div>
+        </div>
+    </main>
 
 
     <script>
 
-        // Get DOM elements
-        const form  = document.querySelector('form');
-        const input = document.querySelector("[name='todo']");
-        const todoList = document.getElementById('todos');
+        const root = document.getElementById("root")
 
-         // Side Effects / Lifecycle
-    
+        const form = document.createElement("form")
+        form.classList.add("input-group", "mb-3")
+
+        const input = document.createElement("input")
+        input.setAttribute("type", "text")
+        input.classList.add("form-control")
+        input.setAttribute("placeholder", "New to-do")
+        input.setAttribute("aria-label", "New to-do")
+        input.setAttribute("aria-describedby", "")
+        input.setAttribute("name", "todo")
+
+        const todoAddBtn = document.createElement("button")
+        todoAddBtn.classList.add("btn", "btn-secondary")
+        todoAddBtn.setAttribute("type", "button")
+        todoAddBtn.id = "add-new-to-do"
+        todoAddBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>`
+
+        const todoList = document.createElement("div")
+        todoList.id = "to-do-list"
+
+        form.append(input)
+        form.append(todoAddBtn)
+        root.append(form)
+        root.append(todoList)
+
+
         const existingTodos = JSON.parse(localStorage.getItem('todos')) || [];
 
         const todoData = [];
-        
+
         existingTodos.forEach(todo => {
             addTodo(todo);
         });
@@ -36,9 +59,27 @@
 
         function addTodo(todoText) {
             todoData.push(todoText);
-            const li = document.createElement('li')
-            li.innerHTML = todoText;
-            todoList.appendChild(li);
+            const singleItemWrapper = document.createElement('div')
+            singleItemWrapper.classList.add("input-group", "mb-3")
+            const inputGroupText = document.createElement('div')
+            inputGroupText.classList.add("input-group-text")
+            const singleItemCheckbox = document.createElement('input')
+            singleItemCheckbox.classList.add("form-check-input", "mt-0")
+            singleItemCheckbox.setAttribute("type", "checkbox")
+            // singleItemCheckbox.setAttribute("value", "")
+            singleItemCheckbox.setAttribute("aria-label", "Checkbox for following to-do item")
+
+            const singleItemInput = document.createElement('input')
+            singleItemInput.classList.add("form-control")
+            singleItemInput.setAttribute("type", "text")
+            singleItemInput.setAttribute("aria-label", "New to-do item")
+            singleItemInput.value = todoText;
+
+            inputGroupText.append(singleItemCheckbox)
+            singleItemWrapper.append(inputGroupText)
+            singleItemWrapper.append(singleItemInput)
+
+            todoList.appendChild(singleItemWrapper);
             localStorage.setItem('todos', JSON.stringify(todoData));
             input.value = ''
         }
@@ -48,6 +89,22 @@
             event.preventDefault();
             addTodo(input.value);
         }
+
+        // if checked
+        const checkboxes = [...document.querySelectorAll('[type="checkbox"]')]
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", () => {
+                if (checkbox.checked) {
+                    checkbox.parentNode.nextSibling.style.textDecoration = "line-through"
+                    checkbox.parentNode.parentNode.style.opacity = "0.5"
+                } else {
+                    checkbox.parentNode.nextSibling.style.textDecoration = "none"
+                    checkbox.parentNode.parentNode.style.opacity = "1"
+                }
+
+            })
+
+        })
 
 
     </script>
